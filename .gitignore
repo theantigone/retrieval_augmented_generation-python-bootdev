@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+#keep large data files out of version control
+/data/
