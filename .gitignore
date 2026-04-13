@@ -11,3 +11,5 @@ wheels/
 
 #keep large data files out of version control
 /data/
+uv.lock
+cache/
