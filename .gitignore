@@ -10,7 +10,7 @@ wheels/
 .venv
 
 #keep large data files out of version control
-/data/
+#/data/ #in production, remove this, but i actually need this for cross-functional development....
 uv.lock
 cache/
 

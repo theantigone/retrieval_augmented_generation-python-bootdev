@@ -10,6 +10,8 @@ from lib.keyword_search import (
     tf_command,
     tfidf_command,
     bm25_tf_command
+    #ch3 l4
+    #bm25search_command
 )
 
 from lib.constants import BM25_K1
@@ -53,8 +55,13 @@ def main() -> None:
     bm25_tf_parser.add_argument("doc_id", type=int, help="Document ID")
     bm25_tf_parser.add_argument("term", type=str, help="Term to get BM25 TF score for")
     bm25_tf_parser.add_argument("k1", type=float, nargs='?', default=BM25_K1, help="Tunable BM25 K1 parameter")
-    #again...
+    #ch3 l3
 #    bm25_tf_parser.add_argument("b", type=float, nargs='?', default=BM25_B, help="Tunable BM25 b parameter")
+
+    #ch3 l4
+#    bm25search_parser = subparsers.add_parser("bm25search", help="Search movies using full BM25 scoring")
+#    bm25search_parser.add_argument("query", type=str, help="Search query")
+#    bm25search_parser.add_argument("limit", type=int,nargs='?',default=5, help="How many documents to present")
 
     args = parser.parse_args()
 
@@ -86,10 +93,17 @@ def main() -> None:
         case'bm25tf':
             bm25tf=bm25_tf_command(args.doc_id,args.term,args.k1)
             print(f"BM25 TF score of '{args.term}' in document '{args.doc_id}': {bm25tf:.2f}")
-            #again...
+            #ch3 l3
 #        case'bm25tf':
 #            bm25tf=bm25_tf_command(args.doc_id,args.term,args.k1,args.b)
 #            print(f"BM25 TF score of '{args.term}' in document '{args.doc_id}': {bm25tf:.2f}")
+
+        #ch3 l4
+#        case'bm25search':
+#            bm25search=bm25search_command(args.query,args.limit)
+#            results = search_command(args.query)
+#            for i,(key,value) in enumerate(bm25search.items(),1):
+#                print(f'{i}. ({key}) {results[i]['title']} - Score: {value}')
         case _:
             parser.print_help()
 
