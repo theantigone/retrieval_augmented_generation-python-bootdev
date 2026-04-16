@@ -5,6 +5,7 @@ import string
 from collections import Counter, defaultdict
 
 from nltk.stem import PorterStemmer
+from constants import BM25_K1,BM25_B
 
 from .search_utils import (
     CACHE_DIR,
@@ -22,6 +23,8 @@ class InvertedIndex:
         self.docmap_path = os.path.join(CACHE_DIR, "docmap.pkl")
         self.tf_path = os.path.join(CACHE_DIR, "term_frequencies.pkl")
         self.term_frequencies = defaultdict(Counter)
+        self.doc_lengths={}
+        self.doc_lengths_path=os.path.join(CACHE_DIR,'doc_lengths.pkl')
 
     def build(self) -> None:
         movies = load_movies()
@@ -39,6 +42,8 @@ class InvertedIndex:
             pickle.dump(self.docmap, f)
         with open(self.tf_path, "wb") as f:
             pickle.dump(self.term_frequencies, f)
+        with open(self.doc_lengths_path, "wb") as f:
+            pickle.dump(self.doc_lengths, f)
 
     def load(self) -> None:
         with open(self.index_path, "rb") as f:
@@ -47,6 +52,8 @@ class InvertedIndex:
             self.docmap = pickle.load(f)
         with open(self.tf_path, "rb") as f:
             self.term_frequencies = pickle.load(f)
+        with open(self.doc_lengths_path, "rb") as f:
+            self.doc_lengths= pickle.load(f)
 
     def get_documents(self, term: str) -> list[int]:
         doc_ids = self.index.get(term, set())
@@ -57,6 +64,7 @@ class InvertedIndex:
         for token in set(tokens):
             self.index[token].add(doc_id)
         self.term_frequencies[doc_id].update(tokens)
+        self.doc_lengths[doc_id]=len(tokens)
 
     def get_tf(self, doc_id: int, term: str) -> int:
         tokens = tokenize_text(term)
@@ -87,6 +95,28 @@ class InvertedIndex:
         tf = self.get_tf(doc_id, term)
         idf = self.get_idf(term)
         return tf * idf
+
+    def get_bm25_tf(self,doc_id:int,term:str,k1=BM25_K1)->float:
+        raw_tf=self.get_tf(doc_id,term)
+        return (raw_tf*(k1+1))/(raw_tf+k1)
+
+        #add this method after passing ch3 l2
+#    def get_bm25_tf(self,doc_id:int,term:str,k1=BM25_K1,b=BM25_B)->float:
+#        tf=self.get_tf(doc_id,term)
+#
+#        avg_doc_length=__get_avg_doc_length()
+#        # Length normalization factor
+#        length_norm = 1 - b + b * (self.doc_length / avg_doc_length)
+#        
+#        # Apply to term frequency
+#        tf_component = (tf * (k1 + 1)) / (tf + k1 * length_norm)
+
+    def __get_avg_doc_length(self)->float:
+        if len(self.doc_lengths)==0:
+            return 0.0
+            for doc_id in self.doc_lengths:
+                sum+=len(self.doc_lengths[doc_id])
+        return sum/len(self.doc_lengths)
 
 
 def build_command() -> None:
@@ -161,4 +191,15 @@ def tfidf_command(doc_id: int, term: str) -> float:
     idx = InvertedIndex()
     idx.load()
     return idx.get_tf_idf(doc_id, term)
+
+def bm25_tf_command(doc_id:int,term:str,k1=BM25_K1)->float:
+    idx=InvertedIndex()
+    idx.load()
+    return idx.get_bm25_tf(doc_id,term,k1)
+
+#again...
+#def bm25_tf_command(doc_id:int,term:str,k1=BM25_K1,b=BM25_B)->float:
+#    idx=InvertedIndex()
+#    idx.load()
+#    return idx.get_bm25_tf(doc_id,term,k1,b)
 
