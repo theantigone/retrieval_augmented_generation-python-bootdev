@@ -1,9 +1,8 @@
+from pathlib import Path
+import os
+import numpy as np
 from sentence_transformers import SentenceTransformer
 from .search_utils import load_movies
-from pathlib import Path
-
-import numpy as np
-import os
 
 
 class SemanticSearch:
@@ -66,3 +65,11 @@ def verify_embeddings():
     print(
         f"Embeddings shape: {embeddings.shape[0]} vectors in {embeddings.shape[1]} dimensions"
     )
+
+
+def embed_query_text(query):
+    ss = SemanticSearch()
+    embedding = ss.generate_embedding(query)
+    print(f"Query: {query}")
+    print(f"First 3 dimensions: {embedding[:3]}")
+    print(f"Shape: {embedding.shape}")

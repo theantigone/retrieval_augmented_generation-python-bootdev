@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-from lib.semantic_search import verify_model, embed_text, verify_embeddings
+from lib.semantic_search import (
+    verify_model,
+    embed_text,
+    verify_embeddings,
+    embed_query_text,
+)
 
 import argparse
 
@@ -11,16 +16,25 @@ def main():
 
     subparsers.add_parser("verify", help="Verify the embedding model loads properly")
 
-    embed_parser = subparsers.add_parser("embed_text", help="Embed the text")
+    embed_parser = subparsers.add_parser(
+        "embed_text", help="Encode the query with embedding model"
+    )
     embed_parser.add_argument("text", type=str, help="Text to be encoded")
 
     subparsers.add_parser(
         "verify_embeddings", help="Verify the embedding model loads properly"
     )
 
+    embedquery_parser = subparsers.add_parser(
+        "embedquery", help="Encode query with embedding model"
+    )
+    embedquery_parser.add_argument("query", type=str, help="User query to be encoded")
+
     args = parser.parse_args()
 
     match args.command:
+        case "embedquery":
+            embed_query_text(args.query)
         case "verify_embeddings":
             verify_embeddings()
         case "embed_text":
