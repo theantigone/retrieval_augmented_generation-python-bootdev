@@ -118,15 +118,20 @@ def search_movies(query: str, limit: int = 5) -> None:
         print(f"\t{result['description']}")
 
 
-def fixed_sized_chunking(text: str, chunk_size: int = 200) -> list[str]:
+def fixed_sized_chunking(
+    text: str, chunk_size: int = 200, overlap: int = 0
+) -> list[str]:
     words: list[str] = text.rsplit()
     chunks = []
     for i in range(0, len(words), chunk_size):
-        chunks.append(" ".join(words[i : i + chunk_size]))
+        if i > 0 and overlap > 0:
+            chunks.append(" ".join(words[i - overlap : i + chunk_size]))
+        else:
+            chunks.append(" ".join(words[i : i + chunk_size]))
     return chunks
 
 
-def chunk_text(text: str, chunk_size: int = 200) -> None:
+def chunk_text(text: str, chunk_size: int = 200, overlap: int = 0) -> None:
     chunks = fixed_sized_chunking(text, chunk_size)
     print(f"Chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):

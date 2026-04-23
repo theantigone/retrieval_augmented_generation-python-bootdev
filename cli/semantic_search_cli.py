@@ -55,12 +55,19 @@ def main():
         default=200,
         help="Number of words in each fixed sized chunk",
     )
+    chunk_parser.add_argument(
+        "--overlap",
+        type=int,
+        nargs="?",
+        default=0,
+        help="Extra words to give chunks context",
+    )
 
     args = parser.parse_args()
 
     match args.command:
         case "chunk":
-            chunk_text(args.text, args.chunk_size)
+            chunk_text(args.text, args.chunk_size, args.overlap)
         case "search":
             search_movies(args.query, args.limit)
         case "embedquery":
