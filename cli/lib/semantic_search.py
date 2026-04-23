@@ -118,19 +118,16 @@ def search_movies(query: str, limit: int = 5) -> None:
         print(f"\t{result['description']}")
 
 
-def chunk_text(text: str, chunk_size: int = 200) -> None:
-    spliced_text: list[str] = text.rsplit()
+def fixed_sized_chunking(text: str, chunk_size: int = 200) -> list[str]:
+    words: list[str] = text.rsplit()
     chunks = []
-    tmp = []
-    count = 0
-    for word in spliced_text:
-        if count <= chunk_size:
-            tmp.append(word)
-            count += 1
-        else:
-            chunks.append(" ".join(tmp))
-            tmp.clear()
-            count = 0
-    print(f"Chunking {chunk_size} characters")
+    for i in range(0, len(words), chunk_size):
+        chunks.append(" ".join(words[i : i + chunk_size]))
+    return chunks
+
+
+def chunk_text(text: str, chunk_size: int = 200) -> None:
+    chunks = fixed_sized_chunking(text, chunk_size)
+    print(f"Chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):
         print(f"{i + 1}. {chunk}")

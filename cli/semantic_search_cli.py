@@ -45,22 +45,22 @@ def main():
     )
 
     chunk_parser = subparsers.add_parser(
-        "chunk", help="Divides document into multiple documents"
+        "chunk", help="Divides document into multiple chunks"
     )
-    search_parser.add_argument("text", type=str, help="Text to chunk")
-    search_parser.add_argument(
+    chunk_parser.add_argument("text", type=str, help="Document to be chunked")
+    chunk_parser.add_argument(
         "--chunk-size",
         type=int,
         nargs="?",
         default=200,
-        help="Size of the divided document",
+        help="Number of words in each fixed sized chunk",
     )
 
     args = parser.parse_args()
 
     match args.command:
         case "chunk":
-            chunk_text(args.text)
+            chunk_text(args.text, args.chunk_size)
         case "search":
             search_movies(args.query, args.limit)
         case "embedquery":
