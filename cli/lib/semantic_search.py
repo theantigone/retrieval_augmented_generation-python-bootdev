@@ -65,13 +65,13 @@ class SemanticSearch:
         return top_results
 
 
-def verify_model():
+def verify_model() -> None:
     ss = SemanticSearch()
     print(f"Model loaded: {ss.model}")
     print(f"Max sequence length: {ss.model.max_seq_length}")
 
 
-def embed_text(text):
+def embed_text(text: str) -> None:
     ss = SemanticSearch()
     embedding = ss.generate_embedding(text)
     print(f"Text: {text}")
@@ -79,7 +79,7 @@ def embed_text(text):
     print(f"Dimensions: {embedding.shape[0]}")
 
 
-def verify_embeddings():
+def verify_embeddings() -> None:
     ss = SemanticSearch()
     documents = load_movies()
     embeddings = ss.load_or_create_embeddings(documents)
@@ -89,7 +89,7 @@ def verify_embeddings():
     )
 
 
-def embed_query_text(query):
+def embed_query_text(query: str) -> None:
     ss = SemanticSearch()
     embedding = ss.generate_embedding(query)
     print(f"Query: {query}")
@@ -97,7 +97,7 @@ def embed_query_text(query):
     print(f"Shape: {embedding.shape}")
 
 
-def cosine_similarity(vec1, vec2):
+def cosine_similarity(vec1: float, vec2: float) -> float:
     dot_product = np.dot(vec1, vec2)
     norm1 = np.linalg.norm(vec1)
     norm2 = np.linalg.norm(vec2)
@@ -108,7 +108,7 @@ def cosine_similarity(vec1, vec2):
     return dot_product / (norm1 * norm2)
 
 
-def search_movies(query, limit=5):
+def search_movies(query: str, limit: int = 5) -> None:
     ss = SemanticSearch()
     documents = load_movies()
     ss.load_or_create_embeddings(documents)
@@ -116,3 +116,21 @@ def search_movies(query, limit=5):
     for i, result in enumerate(search_results):
         print(f"{i + 1}. {result['title']} (score: {result['score']:.4f}")
         print(f"\t{result['description']}")
+
+
+def chunk_text(text: str, chunk_size: int = 200) -> None:
+    spliced_text: list[str] = text.rsplit()
+    chunks = []
+    tmp = []
+    count = 0
+    for word in spliced_text:
+        if count <= chunk_size:
+            tmp.append(word)
+            count += 1
+        else:
+            chunks.append(" ".join(tmp))
+            tmp.clear()
+            count = 0
+    print(f"Chunking {chunk_size} characters")
+    for i, chunk in enumerate(chunks):
+        print(f"{i + 1}. {chunk}")

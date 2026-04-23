@@ -6,6 +6,7 @@ from lib.semantic_search import (
     verify_embeddings,
     embed_query_text,
     search_movies,
+    chunk_text,
 )
 
 import argparse
@@ -43,9 +44,23 @@ def main():
         help="Limit the number of movie results",
     )
 
+    chunk_parser = subparsers.add_parser(
+        "chunk", help="Divides document into multiple documents"
+    )
+    search_parser.add_argument("text", type=str, help="Text to chunk")
+    search_parser.add_argument(
+        "--chunk-size",
+        type=int,
+        nargs="?",
+        default=200,
+        help="Size of the divided document",
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "chunk":
+            chunk_text(args.text)
         case "search":
             search_movies(args.query, args.limit)
         case "embedquery":
