@@ -123,16 +123,17 @@ def fixed_sized_chunking(
 ) -> list[str]:
     words: list[str] = text.rsplit()
     chunks = []
-    for i in range(0, len(words), chunk_size):
-        if i > 0 and overlap > 0:
-            chunks.append(" ".join(words[i - overlap : i + chunk_size]))
-        else:
-            chunks.append(" ".join(words[i : i + chunk_size]))
+    step_size = chunk_size - overlap
+    for i in range(0, len(words), step_size):
+        chunked_words = words[i : i + chunk_size]
+        if len(chunked_words) <= overlap:
+            break
+        chunks.append(" ".join(chunked_words))
     return chunks
 
 
 def chunk_text(text: str, chunk_size: int = 200, overlap: int = 0) -> None:
-    chunks = fixed_sized_chunking(text, chunk_size)
+    chunks = fixed_sized_chunking(text, chunk_size, overlap)
     print(f"Chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):
         print(f"{i + 1}. {chunk}")
