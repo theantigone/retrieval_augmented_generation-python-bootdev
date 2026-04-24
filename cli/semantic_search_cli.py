@@ -8,6 +8,7 @@ from lib.semantic_search import (
     search_movies,
     chunk_text,
     semantically_chunk_text,
+    embed_chunks,
 )
 
 import argparse
@@ -83,9 +84,15 @@ def main():
         help="Extra sentences to give chunks context",
     )
 
+    embed_chunk_parser = subparsers.add_parser(
+        "embed_chunks", help="Chunk semantic embeddings"
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "embed_chunks":
+            embed_chunks()
         case "semantic_chunk":
             semantically_chunk_text(args.text, args.max_chunk_size, args.overlap)
         case "chunk":
