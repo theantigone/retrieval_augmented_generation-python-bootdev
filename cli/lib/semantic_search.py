@@ -88,7 +88,7 @@ class ChunkedSemanticSearch(SemanticSearch):
                 doc["description"], max_chunk_size=4, overlap=1
             )
             all_chunks += chunks
-            for chunk_idx in all_chunks:
+            for chunk_idx in range(len(all_chunks)):
                 chunk_metadata.append(
                     {
                         "movie_idx": doc_idx,
@@ -98,6 +98,7 @@ class ChunkedSemanticSearch(SemanticSearch):
                 )
         self.chunk_embeddings = self.model.encode(all_chunks, show_progress_bar=True)
         self.chunk_metadata = chunk_metadata
+        os.makedirs("cache", exist_ok=True)
         np.save(self.chunk_embeddings_path, self.chunk_embeddings)
         with open(self.chunk_metadata_path, "w") as f:
             (
