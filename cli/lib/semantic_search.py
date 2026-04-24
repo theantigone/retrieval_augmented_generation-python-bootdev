@@ -87,8 +87,7 @@ class ChunkedSemanticSearch(SemanticSearch):
             chunks = fixed_sized_semantic_chunking(
                 doc["description"], max_chunk_size=4, overlap=1
             )
-            for chunk in chunks:
-                all_chunks.append(chunk)
+            all_chunks += chunks
             for chunk_idx in all_chunks:
                 chunk_metadata.append(
                     {
@@ -101,9 +100,13 @@ class ChunkedSemanticSearch(SemanticSearch):
         self.chunk_metadata = chunk_metadata
         np.save(self.chunk_embeddings_path, self.chunk_embeddings)
         with open(self.chunk_metadata_path, "w") as f:
-            json.dump(
-                {"chunks": chunk_metadata, "total_chunks": len(all_chunks)}, f, indent=2
-            ),
+            (
+                json.dump(
+                    {"chunks": chunk_metadata, "total_chunks": len(all_chunks)},
+                    f,
+                    indent=2,
+                ),
+            )
         return self.chunk_embeddings
 
     def load_or_create_chunk_embeddings(self, documents: list[dict]) -> np.ndarray:
