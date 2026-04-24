@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import numpy as np
+import re
 from sentence_transformers import SentenceTransformer
 from .search_utils import load_movies
 
@@ -135,5 +136,28 @@ def fixed_sized_chunking(
 def chunk_text(text: str, chunk_size: int = 200, overlap: int = 0) -> None:
     chunks = fixed_sized_chunking(text, chunk_size, overlap)
     print(f"Chunking {len(text)} characters")
+    for i, chunk in enumerate(chunks):
+        print(f"{i + 1}. {chunk}")
+
+
+def fixed_sized_semantic_chunking(
+    text: str, max_chunk_size: int = 4, overlap: int = 0
+) -> list[str]:
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    chunks = []
+    step_size = max_chunk_size - overlap
+    for i in range(0, len(sentences), step_size):
+        chunked_sentences = sentences[i : i + max_chunk_size]
+        if len(chunked_sentences) <= overlap:
+            break
+        chunks.append(" ".join(chunked_sentences))
+    return chunks
+
+
+def semantically_chunk_text(
+    text: str, max_chunk_size: int = 4, overlap: int = 0
+) -> None:
+    chunks = fixed_sized_semantic_chunking(text, max_chunk_size, overlap)
+    print(f"Semantically chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):
         print(f"{i + 1}. {chunk}")

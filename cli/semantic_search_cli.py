@@ -7,6 +7,7 @@ from lib.semantic_search import (
     embed_query_text,
     search_movies,
     chunk_text,
+    semantically_chunk_text,
 )
 
 import argparse
@@ -63,9 +64,30 @@ def main():
         help="Extra words to give chunks context",
     )
 
+    semantic_chunk_parser = subparsers.add_parser(
+        "semantic_chunk", help="Chunk based on semantic meaning"
+    )
+    semantic_chunk_parser.add_argument("text", type=str, help="Document to be chunked")
+    semantic_chunk_parser.add_argument(
+        "--max-chunk-size",
+        type=int,
+        nargs="?",
+        default=4,
+        help="Number of sentences in each fixed sized chunk",
+    )
+    semantic_chunk_parser.add_argument(
+        "--overlap",
+        type=int,
+        nargs="?",
+        default=0,
+        help="Extra sentences to give chunks context",
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "semantic_chunk":
+            semantically_chunk_text(args.text, args.max_chunk_size, args.overlap)
         case "chunk":
             chunk_text(args.text, args.chunk_size, args.overlap)
         case "search":
