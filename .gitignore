@@ -13,7 +13,7 @@ wheels/
 #/data/ #in production, remove this, but i actually need this for cross-functional development....
 #/data/
 uv.lock
-#cache/
+cache/
 
 #ignore vim swap files
 *.swp
