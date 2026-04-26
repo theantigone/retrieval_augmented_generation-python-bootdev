@@ -46,7 +46,7 @@ class SemanticSearch:
             return self.build_embeddings(documents)
 
     def search(self, query, limit):
-        if not self.embeddings:
+        if self.embeddings is None:
             raise ValueError(
                 "No embeddings loaded. Call `load_or_create_embeddings` first."
             )
@@ -84,16 +84,18 @@ class ChunkedSemanticSearch(SemanticSearch):
         all_chunks = []
         for doc_idx, doc in enumerate(self.documents):
             if not doc["description"]:
-                break
+                continue
             chunks = fixed_sized_semantic_chunking(
                 doc["description"], max_chunk_size=4, overlap=1
             )
+            start_idx = len(all_chunks)
             all_chunks += chunks
-            for chunk_idx in range(len(all_chunks)):
+            for local_chunk_idx in range(len(chunks)):
                 chunk_metadata.append(
                     {
                         "movie_idx": doc_idx,
-                        "chunk_idx": chunk_idx,
+                        "chunk_idx": start_idx + local_chunk_idx,
+                        "chunk_idx_within_movie": local_chunk_idx,  # optional
                         "total_chunks": len(chunks),
                     }
                 )
@@ -118,10 +120,15 @@ class ChunkedSemanticSearch(SemanticSearch):
         if os.path.exists(self.chunk_embeddings_path) and os.path.exists(
             self.chunk_metadata_path
         ):
-            self.chunk_embeddings = np.load(self.chunk_embeddings_path)
+            chunk_embeddings = np.load(self.chunk_embeddings_path)
             with open(self.chunk_metadata_path, "r") as f:
-                self.chunk_metadata = json.load(f)
-            return self.chunk_embeddings
+                chunk_metadata = json.load(f)
+
+            if len(chunk_embeddings) == len(chunk_metadata["chunks"]):
+                self.chunk_embeddings = chunk_embeddings
+                self.chunk_metadata = chunk_metadata
+                return self.chunk_embeddings
+
         return self.build_chunk_embeddings(documents)
 
     def search_chunks(self, query: str, limit: int = 10):
@@ -145,14 +152,14 @@ class ChunkedSemanticSearch(SemanticSearch):
         )
         formatted_results = []
         for midx, score in movie_scores_sorted[:limit]:
-            doc = self.document_map[midx]
+            doc = self.documents[midx]
             formatted_results.append(
                 {
                     "id": doc["id"],
                     "title": doc["title"],
                     "document": doc["description"][:100],
                     "score": round(score, 4),
-                    "metadata": self.chunk_metadata["chunks"][midx] or {},
+                    "metadata": {},
                 }
             )
         return formatted_results
