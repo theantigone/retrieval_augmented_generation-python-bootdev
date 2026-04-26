@@ -9,6 +9,7 @@ from lib.semantic_search import (
     chunk_text,
     semantically_chunk_text,
     embed_chunks,
+    search_chunked,
 )
 
 import argparse
@@ -84,13 +85,27 @@ def main():
         help="Extra sentences to give chunks context",
     )
 
-    embed_chunk_parser = subparsers.add_parser(
-        "embed_chunks", help="Chunk semantic embeddings"
+    subparsers.add_parser("embed_chunks", help="Chunk semantic embeddings")
+
+    search_chunk_parser = subparsers.add_parser(
+        "search_chunked", help="Semantically search through chunks"
+    )
+    search_chunk_parser.add_argument(
+        "query", type=str, help="User query to search for chunks"
+    )
+    search_chunk_parser.add_argument(
+        "--limit",
+        type=int,
+        nargs="?",
+        default=5,
+        help="Limit the number of results to show",
     )
 
     args = parser.parse_args()
 
     match args.command:
+        case "search_chunked":
+            search_chunked(args.query, args.limit)
         case "embed_chunks":
             embed_chunks()
         case "semantic_chunk":
