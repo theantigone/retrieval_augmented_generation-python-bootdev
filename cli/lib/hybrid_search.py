@@ -46,7 +46,7 @@ class HybridSearch:
 
 
 def normalize_scores(scores: list[float]) -> list[float]:
-    if len(scores) == 0:
+    if not scores:
         return
     max_score = max(scores)
     min_score = min(scores)

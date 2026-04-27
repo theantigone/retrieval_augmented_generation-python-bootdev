@@ -8,7 +8,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     normalize_parser = subparsers.add_parser(
-        "normalize", help="Normalize BM25 scores into a `0-1` scale"
+        "normalize", help="Normalize a list of scores"
     )
     normalize_parser.add_argument(
         "scores", type=float, nargs="*", help="List of scores to normalize"
@@ -16,24 +16,24 @@ def main() -> None:
 
     weighted_search_parser = subparsers.add_parser(
         "weighted-search",
-        help="Search using keywords and semantics, weighted based on the alpha value",
+        help="A hybrid search with a weighted average combination",
     )
     weighted_search_parser.add_argument(
-        "query", type=str, help="User query to perform a weighted search on"
+        "query", type=str, help="User query to find relative documents for"
     )
     weighted_search_parser.add_argument(
         "--alpha",
         type=float,
         nargs="?",
         default=0.5,
-        help="Dynamically control the weighted between the two scores",
+        help="Percent of weight for BM25",
     )
     weighted_search_parser.add_argument(
         "--limit",
         type=int,
         nargs="?",
         default=5,
-        help="Limit the number of results to show",
+        help="Number of results to return",
     )
 
     args = parser.parse_args()
@@ -44,12 +44,12 @@ def main() -> None:
             for i, (idx, weighted_result) in enumerate(
                 zip(weighted_results.items[0], weighted_results)
             ):
-                print(f"{i+1}. {weighted_result[idx]['title']}")
+                print(f"{i + 1}. {weighted_result[idx]['title']}")
                 print(f"\tHybrid Score: {weighted_result['hybrid_score']}")
                 print(
                     f"\tBM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['semantic_score']}"
                 )
-                print(f"\t{weighted_score[idx]['description']}")
+                print(f"\t{weighted_result[idx]['description']}")
         case "normalize":
             norm_scores = normalize_scores(args.scores)
             for norm_score in norm_scores:
