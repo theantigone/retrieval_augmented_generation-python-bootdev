@@ -45,7 +45,7 @@ class SemanticSearch:
         else:
             return self.build_embeddings(documents)
 
-    def search(self, query, limit):
+    def search(self, query, limit) -> list[dict]:
         if self.embeddings is None:
             raise ValueError(
                 "No embeddings loaded. Call `load_or_create_embeddings` first."
