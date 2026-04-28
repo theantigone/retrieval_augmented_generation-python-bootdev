@@ -31,22 +31,17 @@ class HybridSearch:
             ss_scores.append(ss_result["score"])
         bm25_norm_scores = normalize_scores(bm25_scores)
         ss_norm_scores = normalize_scores(ss_scores)
-        for bm25_norm_score, ss_norm_score, bm25_result, ss_result in zip(
-            bm25_norm_scores, ss_norm_scores, bm25_results, ss_results
-        ):
-            bm25_result["score"] = bm25_norm_score
-            ss_result["score"] = ss_norm_score
         doc_mappings = defaultdict(lambda: 0)
         for doc, bm25_score, semantic_score in zip(
             self.documents, bm25_norm_scores, ss_norm_scores
         ):
-            doc_mappings[doc["id"]] = doc
-            doc_mappings["bm25_score"] = bm25_score
-            doc_mappings["semantic_score"] = semantic_score
-            doc_mappings["hybrid_score"] = hybrid_score(
-                bm25_score, semantic_score, alpha
-            )
-        return sorted(doc_mappings.items(), key=lambda x: x[1], reverse=True)
+            doc_mappings[doc["id"]] = {
+                doc,
+                bm25_score,
+                semantic_score,
+                hybrid_score(bm25_score, semantic_score, alpha),
+            }
+        return sorted(doc_mappings.items(), key=lambda x: x[1][3], reverse=True)
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
     def rrf_search(self, query, k, limit=10):
