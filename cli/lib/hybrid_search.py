@@ -24,13 +24,21 @@ class HybridSearch:
     def weighted_search(self, query: str, alpha: float, limit: int = 5) -> dict:
         bm25_results = self._bm25_search(query, limit * 500)
         ss_results = self.semantic_search.search_chunks(query, limit * 500)
-        combined_results = []
-        for bm25, ss in zip(bm25_results, ss_results):
-            combined_results.append(bm25["score"], ss["score"])
-        norm_scores = normalize_scores(combined_results)
+        bm25_scores = []
+        ss_scores = []
+        for bm25_result, ss_result in zip(bm25_results, ss_results):
+            bm25_scores.append(bm25_result["score"])
+            ss_scores.append(ss_result["score"])
+        bm25_norm_scores = normalize_scores(bm25_scores)
+        ss_norm_scores = normalize_scores(ss_scores)
+        for bm25_norm_score, ss_norm_score, bm25_result, ss_result in zip(
+            bm25_norm_scores, ss_norm_scores, bm25_results, ss_results
+        ):
+            bm25_result["score"] = bm25_norm_score
+            ss_result["score"] = ss_norm_score
         doc_mappings = defaultdict(lambda: 0)
         for doc, bm25_score, semantic_score in zip(
-            self.documents, bm25_results, ss_results
+            self.documents, bm25_norm_scores, ss_norm_scores
         ):
             doc_mappings[doc["id"]] = doc
             doc_mappings["bm25_score"] = bm25_score
@@ -38,7 +46,7 @@ class HybridSearch:
             doc_mappings["hybrid_score"] = hybrid_score(
                 bm25_score, semantic_score, alpha
             )
-        return doc_mappings.sort(key=lambda x: x["hybrid_score"], reverse=True)
+        return sorted(doc_mappings.items(), key=lambda x: x[1], reverse=True)
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
     def rrf_search(self, query, k, limit=10):
