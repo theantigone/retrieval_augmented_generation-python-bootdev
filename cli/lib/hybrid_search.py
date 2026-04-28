@@ -36,12 +36,14 @@ class HybridSearch:
             self.documents, bm25_norm_scores, ss_norm_scores
         ):
             doc_mappings[doc["id"]] = {
-                doc,
-                bm25_score,
-                semantic_score,
-                hybrid_score(bm25_score, semantic_score, alpha),
+                "doc": doc,
+                "bm25_score": bm25_score,
+                "semantic_score": semantic_score,
+                "hybrid_score": hybrid_score(bm25_score, semantic_score, alpha),
             }
-        return sorted(doc_mappings.items(), key=lambda x: x[1][3], reverse=True)
+        return sorted(
+            doc_mappings.items(), key=lambda x: x[1]["hybrid_score"], reverse=True
+        )
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
     def rrf_search(self, query, k, limit=10):
@@ -64,6 +66,8 @@ def hybrid_score(bm25_score: float, semantic_score: float, alpha: float = 0.5) -
 
 
 def weighted_search(query: str, alpha: float, limit: int = 5) -> dict:
+    if alpha < 0 or alpha > 1:
+        raise ValueError("value must be between 0 and 1")
     documents = load_movies()
     hs = HybridSearch(documents)
     return hs.weighted_search(query, alpha, limit)
