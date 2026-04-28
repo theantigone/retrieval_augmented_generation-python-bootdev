@@ -40,16 +40,7 @@ def main() -> None:
 
     match args.command:
         case "weighted-search":
-            weighted_results = weighted_search(args.query, args.alpha, args.limit)
-            for i, (idx, weighted_result) in enumerate(
-                zip(weighted_results.items[0], weighted_results)
-            ):
-                print(f"{i + 1}. {weighted_result[idx]['title']}")
-                print(f"\tHybrid Score: {weighted_result['hybrid_score']}")
-                print(
-                    f"\tBM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['semantic_score']}"
-                )
-                print(f"\t{weighted_result[idx]['description']}")
+            weighted_search(args.query, args.alpha, args.limit)
         case "normalize":
             norm_scores = normalize_scores(args.scores)
             for norm_score in norm_scores:

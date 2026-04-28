@@ -1,5 +1,4 @@
 import os
-from collections import defaultdict
 from lib.search_utils import load_movies
 
 from .keyword_search import InvertedIndex
@@ -23,27 +22,9 @@ class HybridSearch:
 
     def weighted_search(self, query: str, alpha: float, limit: int = 5) -> dict:
         bm25_results = self._bm25_search(query, limit * 500)
-        ss_results = self.semantic_search.search_chunks(query, limit * 500)
-        bm25_scores = []
-        ss_scores = []
-        for bm25_result, ss_result in zip(bm25_results, ss_results):
-            bm25_scores.append(bm25_result["score"])
-            ss_scores.append(ss_result["score"])
-        bm25_norm_scores = normalize_scores(bm25_scores)
-        ss_norm_scores = normalize_scores(ss_scores)
-        doc_mappings = defaultdict(lambda: 0)
-        for doc, bm25_score, semantic_score in zip(
-            self.documents, bm25_norm_scores, ss_norm_scores
-        ):
-            doc_mappings[doc["id"]] = {
-                "doc": doc,
-                "bm25_score": bm25_score,
-                "semantic_score": semantic_score,
-                "hybrid_score": hybrid_score(bm25_score, semantic_score, alpha),
-            }
-        return sorted(
-            doc_mappings.items(), key=lambda x: x[1]["hybrid_score"], reverse=True
-        )
+        sem_results = self.semantic_search.search_chunks(query, limit * 500)
+        combined_results = combine_search_results(bm25_results, sem_results)
+        return combined_results
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
     def rrf_search(self, query, k, limit=10):
@@ -65,9 +46,64 @@ def hybrid_score(bm25_score: float, semantic_score: float, alpha: float = 0.5) -
     return alpha * bm25_score + (1 - alpha) * semantic_score
 
 
-def weighted_search(query: str, alpha: float, limit: int = 5) -> dict:
+def normalize_search_results(results: list[dict]) -> list[dict]:
+    scores = [r["score"] for r in results]
+    norm_scores = normalize_scores(scores)
+    for idx, result in enumerate(results):
+        result["normalized_score"] = norm_scores[idx]
+    return results
+
+
+def combine_search_results(
+    bm25_results: list[dict], semantic_results: list[dict]
+) -> dict:
+    bm25_norm = normalize_search_results(bm25_results)
+    sem_norm = normalize_search_results(semantic_results)
+
+    combined_norm = {}
+    for norm in bm25_norm:
+        doc_id = norm["id"]
+        combined_norm[doc_id] = {
+            "id": doc_id,
+            "title": norm["title"],
+            "description": norm["document"],
+            "bm25_score": norm["normalized_score"],
+            "sem_score": 0.0,
+        }
+    for norm in sem_norm:
+        doc_id = norm["id"]
+        if doc_id not in combined_norm:
+            combined_norm[doc_id] = {
+                "id": doc_id,
+                "title": norm["title"],
+                "description": norm["document"],
+                "bm25_score": 0.0,
+                "sem_score": norm["normalized_score"],
+            }
+        else:
+            combined_norm[doc_id]["sem_score"] = norm["normalized_score"]
+
+    for key, value in combined_norm.items():
+        combined_norm[key]["hybrid_score"] = hybrid_score(
+            value["bm25_score"], value["sem_score"]
+        )
+
+    results = sorted(
+        combined_norm.values(), key=lambda x: x["hybrid_score"], reverse=True
+    )
+    return results
+
+
+def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
     if alpha < 0 or alpha > 1:
         raise ValueError("value must be between 0 and 1")
     documents = load_movies()
     hs = HybridSearch(documents)
-    return hs.weighted_search(query, alpha, limit)
+    weighted_results = hs.weighted_search(query, alpha, limit)
+    for i, weighted_result in enumerate(weighted_results[:limit]):
+        print(f"{i + 1}. {weighted_result['title']}")
+        print(f"Hybrid Score: {weighted_result['hybrid_score']}")
+        print(
+            f"BM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['sem_score']}"
+        )
+        print(f"{weighted_result['description'][:100]}")
