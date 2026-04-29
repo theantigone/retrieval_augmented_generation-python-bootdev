@@ -1,6 +1,6 @@
 import argparse
 
-from lib.hybrid_search import normalize_scores, weighted_search
+from lib.hybrid_search import normalize_scores, weighted_search, rrf_search
 
 
 def main() -> None:
@@ -36,9 +36,33 @@ def main() -> None:
         help="Number of results to return",
     )
 
+    rrf_parser = subparsers.add_parser(
+        "rrf-search",
+        help="Normalizes documents by ranks instead of scores",
+    )
+    rrf_parser.add_argument(
+        "query", type=str, help="User query to find relative documents for"
+    )
+    rrf_parser.add_argument(
+        "-k",
+        type=float,
+        nargs="?",
+        default=60,
+        help="Controls the weight of higher-ranked results vs. lower ones",
+    )
+    rrf_parser.add_argument(
+        "--limit",
+        type=int,
+        nargs="?",
+        default=5,
+        help="Number of results to return",
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "rrf-search":
+            rrf_search(args.query, args.k, args.limit)
         case "weighted-search":
             weighted_search(args.query, args.alpha, args.limit)
         case "normalize":
