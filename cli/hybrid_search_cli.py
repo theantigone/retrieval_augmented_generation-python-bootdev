@@ -38,7 +38,7 @@ def main() -> None:
 
     rrf_parser = subparsers.add_parser(
         "rrf-search",
-        help="Normalizes documents by ranks instead of scores",
+        help="A hybrid search with RRF combinations (Normalizes documents by ranks instead of scores)",
     )
     rrf_parser.add_argument(
         "query", type=str, help="User query to find relative documents for"
@@ -48,7 +48,7 @@ def main() -> None:
         type=float,
         nargs="?",
         default=60,
-        help="Controls the weight of higher-ranked results vs. lower ones",
+        help="K hyperparameter for RRF (Controls the weight of higher-ranked results vs. lower ones)",
     )
     rrf_parser.add_argument(
         "--limit",
