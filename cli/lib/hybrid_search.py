@@ -135,7 +135,7 @@ def rrf_combine_search_results(
             value["bm25_score"], value["sem_score"], k
         )
 
-    results = sorted(scores.values(), key=lambda x: x["rrf_score"], reverse=True)
+    results = sorted(scores.values(), key=lambda x: x["rrf_score"])
     return results
 
 
