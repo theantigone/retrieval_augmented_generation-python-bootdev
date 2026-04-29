@@ -24,14 +24,14 @@ class HybridSearch:
         bm25_results = self._bm25_search(query, limit * 500)
         sem_results = self.semantic_search.search_chunks(query, limit * 500)
         combined_results = combine_search_results(bm25_results, sem_results, alpha)
-        return combined_results
+        return combined_results[:limit]
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
     def rrf_search(self, query: str, k: int, limit: int = 10):
         bm25_results = self._bm25_search(query, limit * 500)
         sem_results = self.semantic_search.search_chunks(query, limit * 500)
         combined_results = rrf_combine_search_results(bm25_results, sem_results, k)
-        return combined_results
+        return combined_results[:limit]
         # raise NotImplementedError("RRF hybrid search is not implemented yet.")
 
 
@@ -135,7 +135,7 @@ def rrf_combine_search_results(
             value["bm25_score"], value["sem_score"], k
         )
 
-    results = sorted(scores.values(), key=lambda x: x["rrf_score"])
+    results = sorted(scores.values(), key=lambda x: x["rrf_score"], reverse=True)
     return results
 
 
@@ -143,15 +143,8 @@ def rrf_score(rank: int, k: int = 60) -> float:
     return 1 / (k + rank)
 
 
-def rrf_final_score(r1: int, r2: int, k: int = 60) -> int:
-    if r1 and r2:
-        return rrf_score(r1, k) + rrf_score(r2, k)
-    elif r1 and not r2:
-        return rrf_score(r1, k)
-    elif not r1 and r2:
-        return rrf_score(r2, k)
-    else:
-        return 0.0
+def rrf_final_score(s1: float, s2: float, k: int = 60) -> float:
+    return (s1 or 0.0) + (s2 or 0.0)
 
 
 def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
