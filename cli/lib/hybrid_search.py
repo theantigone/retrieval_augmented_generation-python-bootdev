@@ -102,8 +102,8 @@ def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
     weighted_results = hs.weighted_search(query, alpha, limit)
     for i, weighted_result in enumerate(weighted_results[:limit]):
         print(f"{i + 1}. {weighted_result['title']}")
-        print(f"Hybrid Score: {weighted_result['hybrid_score']}")
+        print(f"\tHybrid Score: {weighted_result['hybrid_score']}")
         print(
-            f"BM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['sem_score']}"
+            f"\tBM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['sem_score']}"
         )
-        print(f"{weighted_result['description'][:100]}")
+        print(f"\t{weighted_result['description'][:100]}")
