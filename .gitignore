@@ -17,3 +17,6 @@ cache/
 
 #ignore vim swap files
 *.swp
+
+#uncomment the `.env` file after pulling from cloud repo
+.env
