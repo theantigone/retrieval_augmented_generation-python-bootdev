@@ -14,6 +14,8 @@ STOPWORDS_PATH = os.path.join(PROJECT_ROOT, "data", "stopwords.txt")
 
 CACHE_DIR = os.path.join(PROJECT_ROOT, "cache")
 
+PROMPT_PATH = os.path.join(PROJECT_ROOT, "cli", "lib", "prompts")
+
 
 def load_movies() -> list[dict]:
     with open(DATA_PATH, "r") as f:
@@ -48,4 +50,3 @@ def format_search_result(
         "score": round(score, SCORE_PRECISION),
         "metadata": metadata if metadata else {},
     }
-
