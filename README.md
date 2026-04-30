@@ -4,6 +4,7 @@
 
 - `uv`
 - `python`
+- dependencies in the [requirements.txt](https://github.com/theantigone/retrieval_augmented_generation-python-bootdev/blob/a29a13ed31a8df243cc9e959dbd60f22cb521431/requirements.txt)
 
 ## initialize the virtual environment
 
@@ -41,4 +42,4 @@ GEMINI_API_KEY="your_api_key_here"
 > [!IMPORTANT]
 > paste your api key without the quotation marks (e.g., GEMINI_API_KEY=fans890dfnb7923nf1nf90813nf791rbf)
 
-4. Add the `.env` file to your `.gitignore`!
+4. Add the `.env` file to your [.gitignore](https://github.com/theantigone/retrieval_augmented_generation-python-bootdev/blob/a29a13ed31a8df243cc9e959dbd60f22cb521431/.gitignore)!
