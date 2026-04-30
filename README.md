@@ -4,7 +4,6 @@
 
 - `uv`
 - `python`
-- dependencies in the [requirements.txt](https://github.com/theantigone/retrieval_augmented_generation-python-bootdev/blob/a29a13ed31a8df243cc9e959dbd60f22cb521431/requirements.txt)
 
 ## initialize the virtual environment
 
