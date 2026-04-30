@@ -22,3 +22,8 @@ source .venv/bin/activate
 ```bash
 uv pip install -r requirements.txt
 ```
+
+> [!TIP]
+> to update your `requirements.txt` file, run this command:
+> ```bash
+> uv pip freeze > requirements.txt
