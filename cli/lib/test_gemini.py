@@ -29,9 +29,9 @@ def generate_content(prompt: str, query: str) -> str:
     return response.text
 
 
-def correct_spelling(query):
-    spelling_path = os.path.join(PROMPT_PATH, "spelling.md")
-    with open(spelling_path, "r") as f:
+def augment_prompt(query: str, type: str) -> str:
+    prompt_path = os.path.join(PROMPT_PATH, f"{type}.md")
+    with open(prompt_path, "r") as f:
         prompt = f.read()
     return generate_content(prompt, query)
 
