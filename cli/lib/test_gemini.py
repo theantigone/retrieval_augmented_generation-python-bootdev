@@ -13,11 +13,20 @@ model = "gemma-3-27b-it"
 client = genai.Client(api_key=api_key)
 
 
-def generate_content(prompt: str, query: str) -> str:
-    prompt = prompt.format(query=query)
+def generate_content(prompt: str, query: str, doc: dict = None) -> str:
+    print(doc)
+    prompt = prompt.format(query=query, doc=doc)
     response = client.models.generate_content(
         model=model,
         contents=prompt,
+        config=types.GenerateContentConfig(
+            safety_settings=[
+                types.SafetySetting(
+                    category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                    threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                ),
+            ]
+        ),
     )
     #    response = client.models.generate_content(
     #        model="gemma-3-27b-it",
@@ -29,11 +38,11 @@ def generate_content(prompt: str, query: str) -> str:
     return response.text
 
 
-def augment_prompt(query: str, type: str) -> str:
+def augment_prompt(query: str, type: str, doc: dict = None) -> str:
     prompt_path = os.path.join(PROMPT_PATH, f"{type}.md")
     with open(prompt_path, "r") as f:
         prompt = f.read()
-    return generate_content(prompt, query)
+    return generate_content(prompt, query, doc)
 
 
 if __name__ == "__main__":

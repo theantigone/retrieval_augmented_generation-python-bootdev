@@ -163,16 +163,30 @@ def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
         print(f"   {weighted_result['description'][:100]}")
 
 
-def rrf_search(query: str, k: int = 60, limit: int = 5, enhance: str = None) -> None:
+def rrf_search(
+    query: str, k: int = 60, limit: int = 5, enhance: str = None, rerank: str = None
+) -> None:
     documents = load_movies()
     hs = HybridSearch(documents)
     if enhance:
         new_query = augment_prompt(query, enhance)
         print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
         query = new_query
-    rrf_results = hs.rrf_search(query, k, limit)
+    if rerank and rerank == "individual":
+        rrf_results = hs.rrf_search(query, k, limit * 5)
+        scores = []
+        for doc in rrf_results:
+            scores.append(augment_prompt(query, rerank, doc))
+            sleep(3)
+        scores.sort(key=lambda x: int(x), reverse=True)
+        print(f"Re-ranking top {limit} results using {rerank} method...")
+        print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
+    else:
+        rrf_results = hs.rrf_search(query, k, limit)
     for i, rrf_result in enumerate(rrf_results[:limit]):
         print(f"{i + 1}. {rrf_result['title']}")
+        if rerank:
+            print(f"   Re-rank Score: {scores[i]:.3f}/10")
         print(f"   RRF Score: {rrf_result['rrf_score']:.3f}")
         print(
             f"   BM25 Rank: {rrf_result['bm25_rank']}, Semantic Rank: {rrf_result['sem_rank']}"
