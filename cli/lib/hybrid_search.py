@@ -1,7 +1,7 @@
 import os
-import time
 from lib.search_utils import load_movies
-from lib.test_gemini import augment_prompt
+from lib.llm import augment_prompt
+from lib.rerank import individual_rerank, batch_rerank
 
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
@@ -169,37 +169,33 @@ def rrf_search(
     k: int = 60,
     limit: int = 5,
     enhance: str | None = None,
-    rerank: str | None = None,
+    rerank_method=None,
 ) -> None:
     documents = load_movies()
     hs = HybridSearch(documents)
-    scores = None
     if enhance:
         new_query = augment_prompt(query, enhance)
         print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
         query = new_query
-    if rerank == "individual":
-        rrf_results = hs.rrf_search(query, k, limit * 5)
-        scores = []
-        for i, doc in enumerate(rrf_results, start=1):
-            print(f"Doc {i} completed")
-            score = int(
-                augment_prompt(query, rerank, doc)
-            )  # the `int()` converts a list of `str`s to `int`s
-            scores.append((score, doc))
-            time.sleep(3)  # sleep function to prevent rate limits
-        scores.sort(key=lambda x: x[0], reverse=True)  # sorts in descending order
-        rrf_results = [doc for score, doc in scores]
-        print(f"Re-ranking top {limit} results using {rerank} method...")
+    rrf_limit = limit * 5 if rerank_method else limit
+    results = hs.rrf_search(query, k, rrf_limit)
+    match rerank_method:
+        case "individual":
+            results = individual_rerank(query, results)
+        case "batch":
+            results = batch_rerank(query, results)
+        case _:
+            pass
+    if rerank_method:
+        print(f"Re-ranking top {limit} results using {rerank_method} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
-    else:
-        rrf_results = hs.rrf_search(query, k, limit)
-    for i, rrf_result in enumerate(rrf_results[:limit]):
-        print(f"{i + 1}. {rrf_result['title']}")
-        if rerank == "individual":
-            print(f"   Re-rank Score: {scores[i][0]:.3f}/10")
-        print(f"   RRF Score: {rrf_result['rrf_score']:.3f}")
-        print(
-            f"   BM25 Rank: {rrf_result['bm25_rank']}, Semantic Rank: {rrf_result['sem_rank']}"
-        )
-        print(f"   {rrf_result['description'][:100]}")
+    for idx, r in enumerate(results[:limit]):
+        print(f"{idx}. {r['title']}")
+        match rerank_method:
+            case "individual":
+                print(f"   Re-rank Score: {r['rerank_response']:.3f}/10")
+            case _:
+                pass
+        print(f"   RRF Score: {r['rrf_score']:.3f}")
+        print(f"   BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
+        print(f"   {r['description'][:100]}")

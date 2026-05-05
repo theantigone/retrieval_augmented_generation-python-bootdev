@@ -9,15 +9,17 @@ api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     raise RuntimeError("GEMINI_API_KEY environment variable not set")
 
-model = "gemma-3-27b-it"
-# model = "gemma-4-26b-a4b-it"
+# model = "gemma-3-27b-it"
+model = "gemma-4-26b-a4b-it"
 # model = "gemma-4-31b-it"
 # model = "gemini-3.1-flash-lite-preview"
 client = genai.Client(api_key=api_key)
 
+MODEL = model
 
-def generate_content(prompt: str, query: str, doc: dict | None = None) -> str:
-    prompt = prompt.format(query=query, doc=doc)
+
+def generate_content(prompt: str, query: str) -> str:
+    prompt = prompt.format(query=query)
     response = client.models.generate_content(
         model=model,
         contents=prompt,
@@ -40,11 +42,11 @@ def generate_content(prompt: str, query: str, doc: dict | None = None) -> str:
     return response.text
 
 
-def augment_prompt(query: str, type: str, doc: dict | None = None) -> str:
+def augment_prompt(query: str, type: str) -> str:
     prompt_path = os.path.join(PROMPT_PATH, f"{type}.md")
     with open(prompt_path, "r") as f:
         prompt = f.read()
-    return generate_content(prompt, query, doc)
+    return generate_content(prompt, query)
 
 
 if __name__ == "__main__":
