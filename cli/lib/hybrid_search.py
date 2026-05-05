@@ -37,7 +37,7 @@ class HybridSearch:
         # raise NotImplementedError("RRF hybrid search is not implemented yet.")
 
 
-def normalize_scores(scores: list[float]) -> list[float]:
+def normalize_scores(scores: list[float]) -> list[float] | None:
     if not scores:
         return
     max_score = max(scores)
@@ -165,7 +165,11 @@ def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
 
 
 def rrf_search(
-    query: str, k: int = 60, limit: int = 5, enhance: str = None, rerank: str = None
+    query: str,
+    k: int = 60,
+    limit: int = 5,
+    enhance: str | None = None,
+    rerank: str | None = None,
 ) -> None:
     documents = load_movies()
     hs = HybridSearch(documents)
