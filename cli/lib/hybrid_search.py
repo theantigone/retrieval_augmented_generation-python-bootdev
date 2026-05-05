@@ -169,11 +169,12 @@ def rrf_search(
 ) -> None:
     documents = load_movies()
     hs = HybridSearch(documents)
+    scores = None
     if enhance:
         new_query = augment_prompt(query, enhance)
         print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
         query = new_query
-    if rerank and rerank == "individual":
+    if rerank == "individual":
         rrf_results = hs.rrf_search(query, k, limit * 5)
         scores = []
         for i, doc in enumerate(rrf_results, start=1):
@@ -191,7 +192,7 @@ def rrf_search(
         rrf_results = hs.rrf_search(query, k, limit)
     for i, rrf_result in enumerate(rrf_results[:limit]):
         print(f"{i + 1}. {rrf_result['title']}")
-        if rerank:
+        if rerank == "individual":
             print(f"   Re-rank Score: {scores[i][0]:.3f}/10")
         print(f"   RRF Score: {rrf_result['rrf_score']:.3f}")
         print(
