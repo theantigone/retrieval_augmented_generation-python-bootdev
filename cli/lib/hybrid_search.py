@@ -181,7 +181,7 @@ def rrf_search(
             score = int(
                 augment_prompt(query, rerank, doc)
             )  # the `int()` converts a list of `str`s to `int`s
-            scores.append(score, doc)
+            scores.append((score, doc))
             time.sleep(3)  # sleep function to prevent rate limits
         scores.sort(key=lambda x: x[0], reverse=True)  # sorts in descending order
         rrf_results = [doc for score, doc in scores]
@@ -192,7 +192,7 @@ def rrf_search(
     for i, rrf_result in enumerate(rrf_results[:limit]):
         print(f"{i + 1}. {rrf_result['title']}")
         if rerank:
-            print(f"   Re-rank Score: {scores[i]:.3f}/10")
+            print(f"   Re-rank Score: {scores[i][0]:.3f}/10")
         print(f"   RRF Score: {rrf_result['rrf_score']:.3f}")
         print(
             f"   BM25 Rank: {rrf_result['bm25_rank']}, Semantic Rank: {rrf_result['sem_rank']}"
