@@ -1,20 +1,21 @@
 import os
 from dotenv import load_dotenv
 from lib.search_utils import PROMPT_PATH
+from google import genai
+from google.genai import types
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     raise RuntimeError("GEMINI_API_KEY environment variable not set")
 
-from google import genai
-
-model = "gemma-3-27b-it"
+# model = "gemma-3-27b-it"
+# model = "gemma-4-26b-a4b-it"
+model = "gemma-4-31b-it"
 client = genai.Client(api_key=api_key)
 
 
 def generate_content(prompt: str, query: str, doc: dict = None) -> str:
-    print(doc)
     prompt = prompt.format(query=query, doc=doc)
     response = client.models.generate_content(
         model=model,

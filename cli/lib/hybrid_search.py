@@ -1,4 +1,5 @@
 import os
+import time
 from lib.search_utils import load_movies
 from lib.test_gemini import augment_prompt
 
@@ -175,10 +176,12 @@ def rrf_search(
     if rerank and rerank == "individual":
         rrf_results = hs.rrf_search(query, k, limit * 5)
         scores = []
-        for doc in rrf_results:
+        for i, doc in enumerate(rrf_results, start=1):
+            print(f"Doc {i} completed")
             scores.append(augment_prompt(query, rerank, doc))
-            sleep(3)
-        scores.sort(key=lambda x: int(x), reverse=True)
+            time.sleep(3)  # sleep function to prevent API restrictions
+        scores = list(map(int, scores))  # converts a list of `str`s to a list of `int`s
+        scores.sort(key=lambda x: x, reverse=True)  # sorts in descending order
         print(f"Re-ranking top {limit} results using {rerank} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
     else:

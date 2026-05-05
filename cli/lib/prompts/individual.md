@@ -1,7 +1,7 @@
 """Rate how well this movie matches the search query.
 
 Query: "{query}"
-Movie: {doc["title"]} - {doc["description"]}
+Movie: {doc[title]} - {doc[description]}
 
 Consider:
 - Direct relevance to query

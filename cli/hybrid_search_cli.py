@@ -1,7 +1,6 @@
 import argparse
 
 from lib.hybrid_search import normalize_scores, weighted_search, rrf_search
-from lib.test_gemini import generate_content
 
 
 def main() -> None:
@@ -68,7 +67,7 @@ def main() -> None:
         "--rerank-method",
         type=str,
         choices=["individual"],
-        help="Analyzes the query and the documents together",
+        help="Rerank method; Analyzes the query and the documents together",
     )
 
     args = parser.parse_args()
