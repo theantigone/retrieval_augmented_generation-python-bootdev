@@ -178,10 +178,13 @@ def rrf_search(
         scores = []
         for i, doc in enumerate(rrf_results, start=1):
             print(f"Doc {i} completed")
-            scores.append(augment_prompt(query, rerank, doc))
-            time.sleep(3)  # sleep function to prevent API restrictions
-        scores = list(map(int, scores))  # converts a list of `str`s to a list of `int`s
-        scores.sort(key=lambda x: x, reverse=True)  # sorts in descending order
+            score = int(
+                augment_prompt(query, rerank, doc)
+            )  # the `int()` converts a list of `str`s to `int`s
+            scores.append(score, doc)
+            time.sleep(3)  # sleep function to prevent rate limits
+        scores.sort(key=lambda x: x[0], reverse=True)  # sorts in descending order
+        rrf_results = [doc for score, doc in scores]
         print(f"Re-ranking top {limit} results using {rerank} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
     else:
