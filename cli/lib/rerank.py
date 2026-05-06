@@ -97,8 +97,9 @@ def cross_encoder_rerank(query: str, documents: list[dict]) -> list[dict]:
     cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L2-v2")
     # `predict` returns a list of numbers, one for each pair
     scores = cross_encoder.predict(pairs)
-    scores = sorted(scores, reverse=True)
     results = []
-    for score, (idx, doc) in zip(scores, enumerate(documents)):
+    for score, doc in zip(scores, documents):
         results.append({**doc, "rerank_cross_encoding": score})
+    print(results)
+    results = sorted(results, key=lambda x: x["rerank_cross_encoding"], reverse=True)
     return results

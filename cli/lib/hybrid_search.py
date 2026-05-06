@@ -161,7 +161,7 @@ def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
         print(
             f"   BM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['sem_score']}"
         )
-        print(f"   {weighted_result['description'][:100]}\n")
+        print(f"   {weighted_result['description'][:100]}...\n")
 
 
 def rrf_search(
@@ -201,4 +201,4 @@ def rrf_search(
             print(f"   Cross Encoder Score: {r['rerank_cross_encoding']:.3f}")
         print(f"   RRF Score: {r['rrf_score']:.3f}")
         print(f"   BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
-        print(f"   {r['description'][:100]}\n")
+        print(f"   {r['description'][:100]}...\n")
