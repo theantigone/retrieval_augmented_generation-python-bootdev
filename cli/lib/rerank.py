@@ -100,6 +100,5 @@ def cross_encoder_rerank(query: str, documents: list[dict]) -> list[dict]:
     results = []
     for score, doc in zip(scores, documents):
         results.append({**doc, "rerank_cross_encoding": score})
-    print(results)
     results = sorted(results, key=lambda x: x["rerank_cross_encoding"], reverse=True)
     return results
