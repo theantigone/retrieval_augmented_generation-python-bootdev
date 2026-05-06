@@ -1,7 +1,7 @@
 import os
 from lib.search_utils import load_movies
 from lib.llm import augment_prompt
-from lib.rerank import individual_rerank, batch_rerank
+from lib.rerank import individual_rerank, batch_rerank, cross_encoder_rerank
 
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
@@ -161,7 +161,7 @@ def weighted_search(query: str, alpha: float = 0.5, limit: int = 5) -> None:
         print(
             f"   BM25: {weighted_result['bm25_score']}, Semantic: {weighted_result['sem_score']}"
         )
-        print(f"   {weighted_result['description'][:100]}")
+        print(f"   {weighted_result['description'][:100]}\n")
 
 
 def rrf_search(
@@ -184,6 +184,8 @@ def rrf_search(
             results = individual_rerank(query, results)
         case "batch":
             results = batch_rerank(query, results)
+        case "cross_encoder":
+            results = cross_encoder_rerank(query, results)
         case _:
             pass
     if rerank_method:
@@ -191,8 +193,12 @@ def rrf_search(
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
     for idx, r in enumerate(results[:limit]):
         print(f"{idx + 1}. {r['title']}")
-        if rerank_method:
-            print(f"   Re-rank Score: {r['rerank_response']:.3f}/10")
+        if rerank_method == "individual":
+            print(f"   Re-rank Score: {r['rerank_individual']:.3f}/10")
+        elif rerank_method == "batch":
+            print(f"   Re-rank Score: {r['rerank_batch']}")
+        elif rerank_method == "cross_encoder":
+            print(f"   Cross Encoder Score: {r['rerank_cross_encoding']:.3f}")
         print(f"   RRF Score: {r['rrf_score']:.3f}")
         print(f"   BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
-        print(f"   {r['description'][:100]}")
+        print(f"   {r['description'][:100]}\n")

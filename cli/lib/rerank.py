@@ -1,6 +1,7 @@
 import os
 import time
 import json
+from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
 from lib.search_utils import PROMPT_PATH
 from google import genai
@@ -44,10 +45,10 @@ def individual_rerank(query: str, documents: list[dict]) -> list[dict]:
             print(f"Failed to case {response.text} to int for {doc['title']}")
             print(e)
             clean_response_text = 0
-        results.append({**doc, "rerank_response": clean_response_text})
+        results.append({**doc, "rerank_individual": clean_response_text})
         print(f"Doc {idx} processed")
         time.sleep(3)
-    results = sorted(results, key=lambda x: x["rerank_response"], reverse=True)
+    results = sorted(results, key=lambda x: x["rerank_individual"], reverse=True)
     return results
 
 
@@ -76,11 +77,28 @@ def batch_rerank(query: str, documents: list[dict]) -> list[dict]:
         ),
     )
     print("Finished processing docs")
-    response_parsed = json.loads(response.text)
+    response_parsed = json.loads(response.text.strip("```json").strip("```").strip())
     results = []
     for idx, doc in enumerate(documents):
         results.append(
-            {**doc, "rerank_score": response_parsed.index(idx)}
+            {
+                **doc,
+                "rerank_batch": response_parsed.index(idx) + 1,
+            }  # add 1 because the index starts at 0
         )  # `**doc` gets the value of each key in the for loop
-    results = sorted(results, key=lambda x: x["rerank_score"])
+    results = sorted(results, key=lambda x: x["rerank_batch"])
+    return results
+
+
+def cross_encoder_rerank(query: str, documents: list[dict]) -> list[dict]:
+    pairs = []
+    for doc in documents:
+        pairs.append([query, f"{doc.get('title', '')} - {doc.get('document', '')}"])
+    cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L2-v2")
+    # `predict` returns a list of numbers, one for each pair
+    scores = cross_encoder.predict(pairs)
+    scores = sorted(scores, reverse=True)
+    results = []
+    for score, (idx, doc) in zip(scores, enumerate(documents)):
+        results.append({**doc, "rerank_cross_encoding": score})
     return results
