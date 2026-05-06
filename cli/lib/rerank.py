@@ -16,7 +16,7 @@ model = MODEL
 client = genai.Client(api_key=api_key)
 
 
-def individual_rerank(query: str, documents: dict):
+def individual_rerank(query: str, documents: list[dict]) -> list[dict]:
     individual_rerank_path = os.path.join(PROMPT_PATH, "individual_rerank.md")
     with open(individual_rerank_path, "r") as f:
         prompt = f.read()
@@ -51,17 +51,17 @@ def individual_rerank(query: str, documents: dict):
     return results
 
 
-def batch_rerank(query: str, documents: dict):
-    print("Processing docs now...")
-    individual_rerank_path = os.path.join(PROMPT_PATH, "batch_rerank.md")
-    with open(individual_rerank_path, "r") as f:
+def batch_rerank(query: str, documents: list[dict]) -> list[dict]:
+    batch_rerank_path = os.path.join(PROMPT_PATH, "batch_rerank.md")
+    with open(batch_rerank_path, "r") as f:
         prompt = f.read()
-    _mtemp = """<movie id={idx}>{title}:\n{desc}\n</movie>\n"""
+    _mtemp = """<movie id={idx}=>{title}:\n{desc}\n</movie>\n"""
     doc_list_str = ""
     for idx, doc in enumerate(documents):
         doc_list_str += _mtemp.format(
             idx=idx, title=doc["title"], desc=doc["description"]
         )
+    print("Processing docs now...")
     _prompt = prompt.format(query=query, doc_list_str=doc_list_str)
     response = client.models.generate_content(
         model=model,
@@ -75,9 +75,12 @@ def batch_rerank(query: str, documents: dict):
             ]
         ),
     )
+    print("Finished processing docs")
     response_parsed = json.loads(response.text)
     results = []
     for idx, doc in enumerate(documents):
-        results.append({**doc, "rerank_score": response_parsed.index(idx)})
+        results.append(
+            {**doc, "rerank_score": response_parsed.index(idx)}
+        )  # `**doc` gets the value of each key in the for loop
     results = sorted(results, key=lambda x: x["rerank_score"])
     return results

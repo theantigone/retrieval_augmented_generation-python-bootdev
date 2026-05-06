@@ -169,7 +169,7 @@ def rrf_search(
     k: int = 60,
     limit: int = 5,
     enhance: str | None = None,
-    rerank_method=None,
+    rerank_method: str | None = None,
 ) -> None:
     documents = load_movies()
     hs = HybridSearch(documents)
@@ -190,12 +190,9 @@ def rrf_search(
         print(f"Re-ranking top {limit} results using {rerank_method} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
     for idx, r in enumerate(results[:limit]):
-        print(f"{idx}. {r['title']}")
-        match rerank_method:
-            case "individual":
-                print(f"   Re-rank Score: {r['rerank_response']:.3f}/10")
-            case _:
-                pass
+        print(f"{idx + 1}. {r['title']}")
+        if rerank_method:
+            print(f"   Re-rank Score: {r['rerank_response']:.3f}/10")
         print(f"   RRF Score: {r['rrf_score']:.3f}")
         print(f"   BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
         print(f"   {r['description'][:100]}")
