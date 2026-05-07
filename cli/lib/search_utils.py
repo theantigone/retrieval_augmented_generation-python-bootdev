@@ -16,6 +16,8 @@ CACHE_DIR = os.path.join(PROJECT_ROOT, "cache")
 
 PROMPT_PATH = os.path.join(PROJECT_ROOT, "cli", "lib", "prompts")
 
+GOLDEN_DATASET_PATH = os.path.join(PROJECT_ROOT, "data", "golden_dataset.json")
+
 
 def load_movies() -> list[dict]:
     with open(DATA_PATH, "r") as f:
