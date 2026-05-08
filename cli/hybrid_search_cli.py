@@ -69,6 +69,7 @@ def main() -> None:
         choices=["individual", "batch", "cross_encoder"],
         help="Rerank method; Analyzes the query and the documents together",
     )
+    rrf_parser.add_argument("--debug", type=str, help="A piece of a title to track")
 
     args = parser.parse_args()
 
@@ -80,6 +81,7 @@ def main() -> None:
                 args.limit,
                 args.enhance,
                 args.rerank_method,
+                args.debug,
             )
         case "weighted-search":
             weighted_search(args.query, args.alpha, args.limit)

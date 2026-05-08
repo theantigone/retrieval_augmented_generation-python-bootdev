@@ -22,17 +22,22 @@ class HybridSearch:
         self.idx.load()
         return self.idx.bm25_search(query, limit)
 
-    def weighted_search(self, query: str, alpha: float, limit: int = 5) -> dict:
+    def weighted_search(self, query: str, alpha: float, limit: int = 5) -> list[dict]:
         bm25_results = self._bm25_search(query, limit * 500)
         sem_results = self.semantic_search.search_chunks(query, limit * 500)
         combined_results = combine_search_results(bm25_results, sem_results, alpha)
         return combined_results[:limit]
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
-    def rrf_search(self, query: str, k: int, limit: int = 10):
+    def rrf_search(self, query: str, k: int, limit: int = 10, debug: str | None = None):
         bm25_results = self._bm25_search(query, limit * 500)
         sem_results = self.semantic_search.search_chunks(query, limit * 500)
         combined_results = rrf_combine_search_results(bm25_results, sem_results, k)
+        if debug:
+            for r in combined_results:
+                if debug.lower() in r["title"].lower():
+                    print(f"Phase 1 Search for {r['title']:}")
+                    print(f"{r['bm25_rank']=} | {r['sem_rank']=}")
         return combined_results[:limit]
         # raise NotImplementedError("RRF hybrid search is not implemented yet.")
 
@@ -62,7 +67,7 @@ def normalize_search_results(results: list[dict]) -> list[dict]:
 
 def combine_search_results(
     bm25_results: list[dict], sem_results: list[dict], alpha: float
-) -> dict:
+) -> list[dict]:
     bm25_norm = normalize_search_results(bm25_results)
     sem_norm = normalize_search_results(sem_results)
 
@@ -102,7 +107,7 @@ def combine_search_results(
 
 def rrf_combine_search_results(
     bm25_results: list[dict], sem_results: list[dict], k: int = 60
-) -> dict:
+) -> list[dict]:
     scores = {}
 
     for rank, result in enumerate(bm25_results, start=1):
@@ -170,7 +175,10 @@ def rrf_search(
     limit: int = 5,
     enhance: str | None = None,
     rerank_method: str | None = None,
+    debug: str | None = None,
 ) -> None:
+    if debug:
+        print(f"Debugging for movie {debug}")
     documents = load_movies()
     hs = HybridSearch(documents)
     if enhance:
@@ -178,7 +186,16 @@ def rrf_search(
         print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
         query = new_query
     rrf_limit = limit * 5 if rerank_method else limit
-    results = hs.rrf_search(query, k, rrf_limit)
+    results = hs.rrf_search(query, k, rrf_limit, debug)
+    if debug:
+        found = False
+        for idx, r in enumerate(results):
+            if debug.lower() in r["title"].lower():
+                found = True
+                break
+        print(
+            f"DEBUG: Hybrid search post for {debug} is {idx if found else 'not found'}"
+        )
     match rerank_method:
         case "individual":
             results = individual_rerank(query, results)
@@ -189,6 +206,15 @@ def rrf_search(
         case _:
             pass
     if rerank_method:
+        if debug:
+            found = False
+            for idx, r in enumerate(results):
+                if debug.lower() in r["title"].lower():
+                    found = True
+                    break
+            print(
+                f"DEBUG: Reranking post for {debug} is {idx if found else 'not found'}"
+            )
         print(f"Re-ranking top {limit} results using {rerank_method} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
     for idx, r in enumerate(results[:limit]):
