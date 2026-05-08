@@ -38,8 +38,8 @@ def generate_content(prompt: str, query: str, **kwargs) -> str | None:
     #        contents="Why is Boot.dev such a great place to learn about RAG? Use one paragraph maximum.",
     #    )
     #    print(response.text)
-    #    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-    #    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
     return response.text
 
 
