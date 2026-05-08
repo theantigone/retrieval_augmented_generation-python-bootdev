@@ -71,6 +71,12 @@ def main() -> None:
     )
     rrf_parser.add_argument("--debug", type=str, help="A piece of a title to track")
 
+    rrf_parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="Run LLM as a judge on results",
+    )
+
     args = parser.parse_args()
 
     match args.command:
@@ -82,6 +88,7 @@ def main() -> None:
                 args.enhance,
                 args.rerank_method,
                 args.debug,
+                args.evaluate,
             )
         case "weighted-search":
             weighted_search(args.query, args.alpha, args.limit)

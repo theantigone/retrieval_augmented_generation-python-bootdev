@@ -1,6 +1,6 @@
 import os
 from lib.search_utils import load_movies
-from lib.llm import augment_prompt
+from lib.llm import augment_prompt, llm_judge
 from lib.rerank import individual_rerank, batch_rerank, cross_encoder_rerank
 
 from .keyword_search import InvertedIndex
@@ -176,6 +176,7 @@ def rrf_search(
     enhance: str | None = None,
     rerank_method: str | None = None,
     debug: str | None = None,
+    evaluate: bool | None = None,
 ) -> None:
     if debug:
         print(f"Debugging for movie {debug}")
@@ -217,6 +218,8 @@ def rrf_search(
             )
         print(f"Re-ranking top {limit} results using {rerank_method} method...")
         print(f"Reciprocal Rank Fusion Results for '{query}' (k={k}):")
+    if evaluate:
+        formatted_results = []
     for idx, r in enumerate(results[:limit]):
         print(f"{idx + 1}. {r['title']}")
         if rerank_method == "individual":
@@ -228,3 +231,11 @@ def rrf_search(
         print(f"   RRF Score: {r['rrf_score']:.3f}")
         print(f"   BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
         print(f"   {r['description'][:100]}...\n")
+        if evaluate:
+            formatted_results.append(
+                f"<result id={idx}>{r['title']}: {r['description']}</result>"
+            )
+    if evaluate:
+        evals = llm_judge(query, "\n".join(formatted_results))
+        for idx, r in enumerate(results[:limit]):
+            print(f"{idx+1}. {r['title']}: {evals[idx]}/3")
