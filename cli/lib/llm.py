@@ -83,9 +83,9 @@ def llm_judge(query: str, formatted_results: str) -> str:
     return evaluations
 
 
-def answer_question(query: str, documents: list[dict]) -> str:
-    rag_path = os.path.join(PROMPT_PATH, "answer_question.md")
-    with open(rag_path, "r") as f:
+def _rag(query: str, documents: list[dict], prompt_fname: str):
+    prompt_fpath = os.path.join(PROMPT_PATH, prompt_fname)
+    with open(prompt_fpath, "r") as f:
         prompt = f.read()
     print("\nStarting RAG process...")
     response = generate_content(prompt, query, docs=documents)
@@ -93,6 +93,14 @@ def answer_question(query: str, documents: list[dict]) -> str:
         raise RuntimeError("Empty response:", response)
     print("Successfully ran RAG process")
     return response
+
+
+def answer_question(query: str, documents: list[dict]) -> str:
+    return _rag(query, documents, "answer_question.md")
+
+
+def summarize_documents(query: str, documents: list[dict]) -> str:
+    return _rag(query, documents, "summarization.md")
 
 
 if __name__ == "__main__":

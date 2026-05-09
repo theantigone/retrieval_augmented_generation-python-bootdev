@@ -1,15 +1,27 @@
-from lib.llm import answer_question
+from lib.llm import answer_question, summarize_documents
 from lib.hybrid_search import HybridSearch
 from lib.search_utils import load_movies
 
 
-def rag(query: str):
+def question_answering(query: str) -> None:
     movies = load_movies()
     hs = HybridSearch(movies)
-    results = hs.rrf_search(query, k=60, limit=5)
+    rrf_results = hs.rrf_search(query, k=60, limit=5)
     print("Search Results:")
-    for res in results:
+    for res in rrf_results:
         print("-", res["title"])
-    response = answer_question(query, results)
+    response = answer_question(query, rrf_results)
     print("\nRAG Response:")
+    print(response)
+
+
+def doc_summarization(query: str, limit: int = 5) -> None:
+    movies = load_movies()
+    hs = HybridSearch(movies)
+    rrf_results = hs.rrf_search(query, k=60, limit=limit)
+    print("Search Results:")
+    for res in rrf_results:
+        print("-", res["title"])
+    response = summarize_documents(query, rrf_results)
+    print("\nLLM Summary:")
     print(response)
