@@ -87,7 +87,7 @@ def answer_question(query: str, documents: list[dict]) -> str:
     rag_path = os.path.join(PROMPT_PATH, "answer_question.md")
     with open(rag_path, "r") as f:
         prompt = f.read()
-    print("Starting RAG process...")
+    print("\nStarting RAG process...")
     response = generate_content(prompt, query, docs=documents)
     if not response:
         raise RuntimeError("Empty response:", response)

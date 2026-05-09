@@ -10,6 +10,6 @@ def rag(query: str):
     print("Search Results:")
     for res in results:
         print("-", res["title"])
-    response = answer_question(query, movies)
+    response = answer_question(query, results)
     print("\nRAG Response:")
     print(response)
