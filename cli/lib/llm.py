@@ -11,9 +11,9 @@ if not api_key:
     raise RuntimeError("GEMINI_API_KEY environment variable not set")
 
 # model = "gemma-3-27b-it"
-# model = "gemma-4-26b-a4b-it"
+model = "gemma-4-26b-a4b-it"
 # model = "gemma-4-31b-it"
-model = "gemini-3.1-flash-lite-preview"
+# model = "gemini-3.1-flash-lite-preview"
 client = genai.Client(api_key=api_key)
 
 MODEL = model
@@ -44,16 +44,16 @@ def generate_content(prompt: str, query: str, **kwargs) -> str | None:
         contents=prompt,
         config=types.GenerateContentConfig(safety_settings=SAFETY_SETTINGS),
     )
-    #    response = client.models.generate_content(
-    #        model="gemma-3-27b-it",
-    #        contents="Why is Boot.dev such a great place to learn about RAG? Use one paragraph maximum.",
-    #    )
-    #    print(response.text)
+    # response = client.models.generate_content(
+    # model="gemma-3-27b-it",
+    # contents="Why is Boot.dev such a great place to learn about RAG? Use one paragraph maximum.",
+    # )
+    # print(response.text)
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
     print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-    print("Response:", response)
-    print("Response candidates:", response.candidates)
-    print("Response prompt feedback:", response.prompt_feedback)
+    # print("Response:", response)
+    # print("Response candidates:", response.candidates)
+    # print("Response prompt feedback:", response.prompt_feedback)
     if not response or not response.text:
         raise RuntimeError(f"Empty response: {response}")
     return response.text

@@ -29,7 +29,9 @@ class HybridSearch:
         return combined_results[:limit]
         # raise NotImplementedError("Weighted hybrid search is not implemented yet.")
 
-    def rrf_search(self, query: str, k: int, limit: int = 10, debug: str | None = None):
+    def rrf_search(
+        self, query: str, k: int = 60, limit: int = 10, debug: str | None = None
+    ):
         bm25_results = self._bm25_search(query, limit * 500)
         sem_results = self.semantic_search.search_chunks(query, limit * 500)
         combined_results = rrf_combine_search_results(bm25_results, sem_results, k)
