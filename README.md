@@ -35,7 +35,7 @@ uv pip install -r requirements.txt
 3. Copy the API key, then paste it into a new .env file in your project directory. The file should look like this:
 
 ```env
-GEMINI_API_KEY="your_api_key_here"
+GEMINI_API_KEY=your_api_key_here
 ```
 
 > [!IMPORTANT]
