@@ -1,5 +1,5 @@
 import argparse
-from lib.augmented_generation import augmented_generation
+from lib.rag import rag
 
 
 def main():
@@ -17,12 +17,7 @@ def main():
         case "rag":
             query = args.query
             # do RAG stuff here
-            results, response = augmented_generation(query)
-            print("Search Results:")
-            for r in results:
-                print("-", r["title"])
-            print("\nRAG Response:")
-            print(response)
+            rag(query)
         case _:
             parser.print_help()
 

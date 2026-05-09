@@ -1,7 +1,7 @@
 import os
 import json
-from dotenv import load_dotenv
 from lib.search_utils import PROMPT_PATH
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
@@ -72,7 +72,7 @@ def llm_judge(query: str, formatted_results: str) -> str:
         prompt = f.read()
     print("Evaluating docs now...")
     response = generate_content(prompt, query, formatted_results=formatted_results)
-    if not response or not response.text:
+    if not response:
         raise RuntimeError(f"Empty response: {response}")
     try:
         evaluations = json.loads(response)
@@ -81,6 +81,18 @@ def llm_judge(query: str, formatted_results: str) -> str:
         raise e
     print("Successfully evaluated docs")
     return evaluations
+
+
+def answer_question(query: str, documents: list[dict]) -> str:
+    rag_path = os.path.join(PROMPT_PATH, "answer_question.md")
+    with open(rag_path, "r") as f:
+        prompt = f.read()
+    print("Starting RAG process...")
+    response = generate_content(prompt, query, docs=documents)
+    if not response:
+        raise RuntimeError("Empty response:", response)
+    print("Successfully ran RAG process")
+    return response
 
 
 if __name__ == "__main__":
