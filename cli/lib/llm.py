@@ -12,11 +12,29 @@ if not api_key:
 
 # model = "gemma-3-27b-it"
 # model = "gemma-4-26b-a4b-it"
-model = "gemma-4-31b-it"
-# model = "gemini-3.1-flash-lite-preview"
+# model = "gemma-4-31b-it"
+model = "gemini-3.1-flash-lite-preview"
 client = genai.Client(api_key=api_key)
 
 MODEL = model
+SAFETY_SETTINGS = [
+    types.SafetySetting(
+        category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold=types.HarmBlockThreshold.OFF,
+    ),
+    types.SafetySetting(
+        category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold=types.HarmBlockThreshold.OFF,
+    ),
+    types.SafetySetting(
+        category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold=types.HarmBlockThreshold.OFF,
+    ),
+    types.SafetySetting(
+        category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold=types.HarmBlockThreshold.OFF,
+    ),
+]
 
 
 def generate_content(prompt: str, query: str, **kwargs) -> str | None:
@@ -24,14 +42,7 @@ def generate_content(prompt: str, query: str, **kwargs) -> str | None:
     response = client.models.generate_content(
         model=model,
         contents=prompt,
-        config=types.GenerateContentConfig(
-            safety_settings=[
-                types.SafetySetting(
-                    category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                    threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                ),
-            ]
-        ),
+        config=types.GenerateContentConfig(safety_settings=SAFETY_SETTINGS),
     )
     #    response = client.models.generate_content(
     #        model="gemma-3-27b-it",
@@ -66,6 +77,7 @@ def llm_judge(query: str, formatted_results: str) -> str:
     try:
         evaluations = json.loads(response)
     except Exception as e:
+        print("Failed Response:", response)
         raise e
     print("Successfully evaluated docs")
     return evaluations

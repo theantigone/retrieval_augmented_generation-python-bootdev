@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from lib.search_utils import PROMPT_PATH
 from google import genai
 from google.genai import types
-from .llm import MODEL
+from .llm import MODEL, SAFETY_SETTINGS
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -29,14 +29,7 @@ def individual_rerank(query: str, documents: list[dict]) -> list[dict]:
         response = client.models.generate_content(
             model=model,
             contents=_prompt,
-            config=types.GenerateContentConfig(
-                safety_settings=[
-                    types.SafetySetting(
-                        category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                    ),
-                ]
-            ),
+            config=types.GenerateContentConfig(safety_settings=SAFETY_SETTINGS),
         )
         clean_response_text = (response.text or "").strip()
         try:
@@ -67,14 +60,7 @@ def batch_rerank(query: str, documents: list[dict]) -> list[dict]:
     response = client.models.generate_content(
         model=model,
         contents=_prompt,
-        config=types.GenerateContentConfig(
-            safety_settings=[
-                types.SafetySetting(
-                    category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                    threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                ),
-            ]
-        ),
+        config=types.GenerateContentConfig(safety_settings=SAFETY_SETTINGS),
     )
     print("Finished processing docs")
     response_parsed = json.loads(response.text.strip("```json").strip("```").strip())

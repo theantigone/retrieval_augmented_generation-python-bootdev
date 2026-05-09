@@ -238,4 +238,4 @@ def rrf_search(
     if evaluate:
         evals = llm_judge(query, "\n".join(formatted_results))
         for idx, r in enumerate(results[:limit]):
-            print(f"{idx+1}. {r['title']}: {evals[idx]}/3")
+            print(f"{idx + 1}. {r['title']}: {evals[idx]}/3")
