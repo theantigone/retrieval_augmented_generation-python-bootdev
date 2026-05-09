@@ -40,6 +40,11 @@ def generate_content(prompt: str, query: str, **kwargs) -> str | None:
     #    print(response.text)
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
     print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    print("Response:", response)
+    print("Response candidates:", response.candidates)
+    print("Response prompt feedback:", response.prompt_feedback)
+    if not response or not response.text:
+        raise RuntimeError(f"Empty response: {response}")
     return response.text
 
 
@@ -56,6 +61,8 @@ def llm_judge(query: str, formatted_results: str) -> str:
         prompt = f.read()
     print("Evaluating docs now...")
     response = generate_content(prompt, query, formatted_results=formatted_results)
+    if not response or not response.text:
+        raise RuntimeError(f"Empty response: {response}")
     try:
         evaluations = json.loads(response)
     except Exception as e:
