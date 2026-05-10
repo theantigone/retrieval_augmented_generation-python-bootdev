@@ -103,8 +103,8 @@ def summarize_documents(query: str, documents: list[dict]) -> str:
     return _rag(query, documents, "summarization.md")
 
 
-def cite_docs(query: str, documents: list[dict]) -> str:
-    return _rag(query, documents, "citations.md")
+def citations_documents(query: str, documents: list[dict]) -> str:
+    return _rag(query, documents, "answer_with_citations.md")
 
 
 if __name__ == "__main__":
