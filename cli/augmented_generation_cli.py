@@ -1,5 +1,5 @@
 import argparse
-from lib.rag import question_answering, doc_summarization
+from lib.rag import question_answering, doc_summarization, doc_citing
 
 
 def main():
@@ -23,6 +23,16 @@ def main():
         help="doc count to summarize",
     )
 
+    rag_parser = subparsers.add_parser("citations", help="Perform RAG (search + cite)")
+    rag_parser.add_argument("query", type=str, help="Search query for RAG")
+    rag_parser.add_argument(
+        "--limit",
+        type=int,
+        nargs="?",
+        default=5,
+        help="doc count to summarize",
+    )
+
     args = parser.parse_args()
 
     match args.command:
@@ -32,6 +42,8 @@ def main():
             question_answering(query)
         case "summarize":
             doc_summarization(args.query, args.limit)
+        case "citations":
+            doc_citing(args.query, args.limit)
         case _:
             parser.print_help()
 
