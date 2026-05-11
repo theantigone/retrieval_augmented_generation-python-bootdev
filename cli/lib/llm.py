@@ -11,12 +11,13 @@ if not api_key:
     raise RuntimeError("GEMINI_API_KEY environment variable not set")
 
 # model = "gemma-3-27b-it"
-# model = "gemma-4-26b-a4b-it"
-model = "gemma-4-31b-it"
+model = "gemma-4-26b-a4b-it"
+# model = "gemma-4-31b-it"
 # model = "gemini-3.1-flash-lite-preview"
 client = genai.Client(api_key=api_key)
 
 MODEL = model
+CLIENT = client
 SAFETY_SETTINGS = [
     types.SafetySetting(
         category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -95,8 +96,8 @@ def _rag(query: str, documents: list[dict], prompt_fname: str):
     return response
 
 
-def answer_question(query: str, documents: list[dict]) -> str:
-    return _rag(query, documents, "answer_question.md")
+def augmented_generation(query: str, documents: list[dict]) -> str:
+    return _rag(query, documents, "augmented_generation.md")
 
 
 def summarize_documents(query: str, documents: list[dict]) -> str:
@@ -105,6 +106,10 @@ def summarize_documents(query: str, documents: list[dict]) -> str:
 
 def citations_documents(query: str, documents: list[dict]) -> str:
     return _rag(query, documents, "answer_with_citations.md")
+
+
+def answer_question(query: str, documents: list[dict]) -> str:
+    return _rag(query, documents, "answer_question.md")
 
 
 if __name__ == "__main__":
