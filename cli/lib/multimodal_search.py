@@ -6,12 +6,12 @@ class MultimodalSearch:
     def __init__(self, model_name="clip-ViT-B-32"):
         self.model = SentenceTransformer(model_name)
 
-    def embed_image(self, image_path):
-        loaded_image = Image.open(image_path, "r")
-        return self.model.encode(loaded_image)[0]
+    def embed_image(self, image_fpath):
+        img = Image.open(image_fpath, "r")
+        return self.model.encode(img)
 
 
-def verify_image_embedding(image_path):
+def verify_image_embedding(image_fpath):
     ms = MultimodalSearch()
-    embedding = ms.embed_image(image_path)
+    embedding = ms.embed_image(image_fpath)
     print(f"Embedding shape: {embedding.shape[0]} dimensions")
