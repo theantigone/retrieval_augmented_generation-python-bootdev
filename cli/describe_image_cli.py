@@ -1,24 +1,45 @@
 import argparse
-from lib.describe_image import describe_image
+import mimetypes
+import os
+from google.genai import types
+from lib.llm import MODEL, CLIENT, SAFETY_SETTINGS
+from lib.search_utils import PROMPT_PATH
+
+
+def describe_image(image: str, query: str) -> None:
+    mime, _ = mimetypes.guess_type(image)
+    mime = mime or "image/jpeg"
+    with open(image, "rb") as f:
+        img = f.read()
+    describe_image_path = os.path.join(PROMPT_PATH, "describe_image.md")
+    with open(describe_image_path, "r") as f:
+        system_prompt = f.read()
+    parts = (
+        [
+            system_prompt,
+            types.Part.from_bytes(data=img, mime_type=mime),
+            query.strip(),
+        ],
+    )
+    print("\nDescribing image...")
+    response = CLIENT.models.generate_content(
+        model=MODEL,
+        contents=parts,
+        config=types.GenerateContentConfig(safety_settings=SAFETY_SETTINGS),
+    )
+    print(f"Rewritten query: {response.text.strip()}")
+    if response.usage_metadata is not None:
+        print(f"Total tokens:    {response.usage_metadata.total_token_count}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Retrieval Augmented Generation CLI")
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    image_parser = subparsers.add_parser("image", help="Multimodal query rewriting")
-    image_parser.add_argument("--image", type=str, help="Path to an image file")
-    image_parser.add_argument(
-        "--query", type=str, help="Text query to rewrite based on the image"
-    )
+    parser = argparse.ArgumentParser(description="Describe Image CLI")
+    parser.add_argument("--image", type=str, help="Path to image for the rewriting")
+    parser.add_argument("--query", type=str, help="User query that goes with the image")
 
     args = parser.parse_args()
 
-    match args.command:
-        case "image":
-            describe_image(args.image, args.query)
-        case _:
-            parser.print_help()
+    describe_image(args.image, args.query)
 
 
 if __name__ == "__main__":
