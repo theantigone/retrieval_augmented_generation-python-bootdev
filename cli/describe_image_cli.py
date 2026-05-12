@@ -1,9 +1,14 @@
 import argparse
 import mimetypes
-import os
 from google.genai import types
 from lib.llm import MODEL, CLIENT, SAFETY_SETTINGS
-from lib.search_utils import PROMPT_PATH
+
+prompt = """
+Given the included image and text query, rewrite the text query to improve search results from a movie database. Make sure to:
+- Synthesize visual and textual information
+- Focus on movie-specific details (actors, scenes, style, etc.)
+- Return only the rewritten query, without any additional commentary
+"""
 
 
 def describe_image(image: str, query: str) -> None:
@@ -11,8 +16,7 @@ def describe_image(image: str, query: str) -> None:
     mime = mime or "image/jpeg"
     with open(image, "rb") as f:
         img = f.read()
-    describe_image_path = os.path.join(PROMPT_PATH, "describe_image.md")
-    with open(describe_image_path, "r") as f:
+    with open(prompt, "r") as f:
         system_prompt = f.read()
     parts = (
         [
