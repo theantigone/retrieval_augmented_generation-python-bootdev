@@ -1,9 +1,10 @@
-import os
 import json
-from lib.search_utils import PROMPT_PATH
+import os
+
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from lib.search_utils import PROMPT_PATH
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")

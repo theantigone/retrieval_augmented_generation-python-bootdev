@@ -1,9 +1,10 @@
 import argparse
+
 from lib.rag import (
-    retrieving_augmented_generation,
-    doc_summarization,
     doc_citations,
+    doc_summarization,
     question_answering,
+    retrieving_augmented_generation,
 )
 
 

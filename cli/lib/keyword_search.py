@@ -235,4 +235,3 @@ def bm25search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[di
     idx = InvertedIndex()
     idx.load()
     return idx.bm25_search(query, limit)
-

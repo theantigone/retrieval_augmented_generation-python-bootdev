@@ -1,7 +1,8 @@
 import os
-from lib.search_utils import load_movies
+
 from lib.llm import augment_prompt, llm_judge
-from lib.rerank import individual_rerank, batch_rerank, cross_encoder_rerank
+from lib.rerank import batch_rerank, cross_encoder_rerank, individual_rerank
+from lib.search_utils import load_movies
 
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch

@@ -13,4 +13,3 @@ def euclidean_norm(vec):
         total += x**2
 
     return total**0.5
-

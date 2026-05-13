@@ -1,10 +1,12 @@
-from pathlib import Path
-import os
-import numpy as np
-import re
 import json
+import os
+import re
 from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
 from sentence_transformers import SentenceTransformer
+
 from .search_utils import load_movies
 
 

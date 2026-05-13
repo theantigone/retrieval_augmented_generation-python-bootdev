@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-from lib.semantic_search import (
-    verify_model,
-    embed_text,
-    verify_embeddings,
-    embed_query_text,
-    search_movies,
-    chunk_text,
-    semantically_chunk_text,
-    embed_chunks,
-    search_chunked,
-)
-
 import argparse
+
+from lib.semantic_search import (
+    chunk_text,
+    embed_chunks,
+    embed_query_text,
+    embed_text,
+    search_chunked,
+    search_movies,
+    semantically_chunk_text,
+    verify_embeddings,
+    verify_model,
+)
 
 
 def main():

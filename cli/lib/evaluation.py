@@ -1,4 +1,5 @@
 import json
+
 from .hybrid_search import HybridSearch
 from .search_utils import GOLDEN_DATASET_PATH, load_movies
 

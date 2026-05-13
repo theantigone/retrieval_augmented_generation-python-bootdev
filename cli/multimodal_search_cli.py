@@ -15,10 +15,13 @@ def main() -> None:
     )
 
     image_parser = subparsers.add_parser(
-        "image_search", help="Search for image embeddings"
+        "image_search", help="Search for movies based on an image"
     )
     image_parser.add_argument(
         "image_fpath", type=str, help="Path to the image to process"
+    )
+    image_parser.add_argument(
+        "--limit", type=int, nargs="?", default=5, help="Number of results to return"
     )
 
     args = parser.parse_args()
@@ -27,7 +30,7 @@ def main() -> None:
         case "verify_image_embedding":
             verify_image_embedding(args.image_fpath)
         case "image_search":
-            image_search_command(args.image_fpath)
+            image_search_command(args.image_fpath, args.limit)
         case _:
             parser.print_help()
 

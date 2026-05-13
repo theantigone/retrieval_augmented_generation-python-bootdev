@@ -1,6 +1,6 @@
 import argparse
 
-from lib.hybrid_search import normalize_scores, weighted_search, rrf_search
+from lib.hybrid_search import normalize_scores, rrf_search, weighted_search
 
 
 def main() -> None:
